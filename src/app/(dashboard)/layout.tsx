@@ -11,7 +11,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
-  const [isAcademicsOpen, setIsAcademicsOpen] = useState(false)
+  const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({
+    Academics: false,
+    Teachers: false,
+  })
+
+  const toggleMenu = (name: string) => {
+    setOpenMenus(prev => ({ ...prev, [name]: !prev[name] }))
+  }
   const pathname = usePathname()
   const router = useRouter()
 
@@ -181,10 +188,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
   }
 
-  // Set academics open if we are in an academics route
+  // Set dropdowns open if we are in a matching sub-route
   useEffect(() => {
     if (pathname.startsWith('/academics')) {
-      setIsAcademicsOpen(true)
+      setOpenMenus(prev => ({ ...prev, Academics: true }))
+    }
+    if (pathname.startsWith('/dashboard/staff')) {
+      setOpenMenus(prev => ({ ...prev, Teachers: true }))
     }
   }, [pathname])
 
@@ -226,6 +236,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       href: '/students', 
       icon: (
         <svg className="w-5 h-5 transition-transform group-hover:scale-110" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      ) 
+    },
+    { 
+      name: 'Attendance', 
+      href: '/attendance', 
+      icon: (
+        <svg className="w-5 h-5 transition-transform group-hover:scale-110" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+          <path d="m9 16 2 2 4-4" />
+        </svg>
       ) 
     },
     { 
@@ -517,11 +540,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {filteredNavLinks.map((link) => {
               if (link.subLinks) {
                 const isAnySubActive = link.subLinks.some(sub => pathname === sub.href)
+                const isOpen = !!openMenus[link.name]
                 return (
                   <div key={link.name} className="space-y-1">
                     <button
-                      onClick={() => setIsAcademicsOpen(!isAcademicsOpen)}
-                      className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-55 hover:text-slate-900 cursor-pointer ${
+                      onClick={() => toggleMenu(link.name)}
+                      className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-50 hover:text-slate-900 cursor-pointer ${
                         isAnySubActive ? 'text-indigo-700 font-bold bg-indigo-50/30' : ''
                       }`}
                     >
@@ -532,10 +556,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         <span className="text-sm font-semibold">{link.name}</span>
                       </div>
                       <span className="text-[9px] text-slate-400 font-black">
-                        {isAcademicsOpen ? '▼' : '▶'}
+                        {isOpen ? '▼' : '▶'}
                       </span>
                     </button>
-                    {isAcademicsOpen && (
+                    {isOpen && (
                       <div className="pl-8 space-y-1 border-l border-slate-100 ml-6 animate-fadeIn">
                         {link.subLinks.map(sub => {
                           const isSubActive = pathname === sub.href
