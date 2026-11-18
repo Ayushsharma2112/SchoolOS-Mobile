@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  --color-indigo-650: #4338ca;
+  --color-indigo-150: #e0e7ff;
+  --color-slate-55: #f8fafc;
+  --color-slate-150: #e2e8f0;
+  --color-slate-350: #cbd5e1;
+  --color-slate-450: #94a3b8;
+  --color-slate-650: #475569;
+  --color-slate-805: #1e293b;
+  --color-slate-855: #0f172a;
+  --color-rose-250: #fecdd3;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
